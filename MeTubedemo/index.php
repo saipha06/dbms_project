@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<title>Login</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="css/default.css" />
+</head>
+
+
+<div class="topnav" style="display:none;">
+
+  <a class="active logo" href="browse.php"><img src="img/metube.png" width="85" height="40" alt="logo"></a> 
+  <?php
+    if (! empty($_SESSION['logged_in']))
+    {
+        echo "<a href='logout.php'>Logout</a>
+        <a href='update.php'>Profile</a>";
+    }
+    else {
+		
+        echo"<a class='nav-item' href='index.php' style='margin-left:80%;'>Login</a>
+        <a class='nav-item' href='registration.php' >Register</a>";
+    }
+  ?>
+</div>
+
+
+<body style = "background-image:url(img/bg.png)">
+    
+    <div class="card w-25" style="margin-left:30%;margin-top:13%;width:40% !important;">
+    <div class="card-header bg-danger">
+    <a class="active logo" href="browse.php"><img src="img/metube.png" width="85" height="40" alt="logo"></a> 
+
+  </div>
+        <?php
+            session_start();
+
+            include_once "function.php";
+
+            if(isset($_POST['submit'])) {
+                if($_POST['username'] == "" || $_POST['password'] == "") {
+                    $login_error = "One or more fields are missing.";
+                }
+                else {
+                    $check = user_pass_check($_POST['username'],$_POST['password']); // Call functions from function.php
+                    if($check == 1) {
+                        $login_error = "User ".$_POST['username']." not found.";
+                    }
+                    elseif($check==2) {
+                        $login_error = "Incorrect password.";
+                    }
+                    else if($check==3){
+                        $login_error = "Unregistered username.";
+                    }
+                    else if($check==0){
+                        $_SESSION['username']=$_POST['username']; //Set the $_SESSION['username']
+                        $_SESSION['logged_in']=1;
+                        header('Location: browse.php');
+                    }
+                }
+            }
+        ?> 
+        <div class="row ">
+            <div class="col-md-4 offset-md-4">
+            <form method="post" action="<?php echo "index.php"; ?>">
+            <div class="form-group">
+                <label for="exampleInputEmail">User Name</label>
+                <input type="text" name="username" class="text form-control" id="exampleInputEmail1" placeholder="Enter username">
+                
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="text form-control" name="password" id="exampleInputPassword1" placeholder="Enter Password">
+            </div>
+            <div class="row ">
+                <div class="col-md-3">
+                    <button name="submit" type="submit" class="btn btn-success">Login</button>
+                </div>
+                <div class="col-md-4 offset-md-1">
+                    <button name="reset" type="reset" class="btn btn-primary">Reset</button> 
+                </div>
+            </div>
+            <?php
+  if(isset($login_error))
+   {
+    echo "
+    <p class='text-danger' style = 'margin-top:8%;'>".$login_error."</p>";
+    if($check==3) {
+        echo "<a href=registration.php>Click here to register</a>";
+    }
+    }
+?>
+            <p style = "margin-top:10%;">Not a user? <a href=registration.php>Click here to Register.</a></p>
+            </form>
+</div>
+
+
+
+</body>
